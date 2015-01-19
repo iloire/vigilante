@@ -1,23 +1,31 @@
 package core
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestVigilanteAddService(t *testing.T) {
+
+	assert := assert.New(t)
+
 	v := Vigilante{}
-	v.AddService(Service{"service 1", "http://google.com", 5000, new(MockPingService)})
-	v.AddService(Service{"service 2", "http://yahoo.com", 4000, new(MockPingService)})
 
-	if len(v.GetServices()) != 2 {
-		t.Error("We are supossed to have one element")
-	}
+	v.AddService(Service{
+		Name:        "service google",
+		Url:         "http://google.com",
+		Interval:    5000,
+		Timeout:     10000,
+		PingService: new(MockPingService)})
 
-	if v.GetServices()[0].Name != "service 1" {
-		t.Error("Wrong service 1")
-	}
+	v.AddService(Service{
+		Name:        "service yahoo",
+		Url:         "http://yahoo.com",
+		Interval:    5000,
+		Timeout:     10000,
+		PingService: new(MockPingService)})
 
-	if v.GetServices()[1].Name != "service 2" {
-		t.Error("Wrong service 1")
-	}
+	assert.Equal(len(v.GetServices()), 2, "number of services added is correct")
+	assert.Equal(v.GetServices()[0].Name, "service google", "correct service name")
+	assert.Equal(v.GetServices()[1].Name, "service yahoo", "correct service name")
 }

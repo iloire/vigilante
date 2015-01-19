@@ -19,14 +19,14 @@ func (h *HTTP) Ping(url string, timeout time.Duration) PingResult {
 
 	if err != nil {
 		fmt.Println(err)
-		return PingResult{500, elapsed, false}
+		return PingResult{resp.StatusCode, elapsed}
 	}
 
+	// TODO: eventually we need to be able to just ping to get the headers only
+	// so we don't download the entire page.
+	// download the entire page will be necessary if we want to assert for a certain content though
 	defer resp.Body.Close()
 	ioutil.ReadAll(resp.Body)
 
-	if resp.StatusCode != http.StatusOK {
-		return PingResult{resp.StatusCode, elapsed, false}
-	}
-	return PingResult{200, elapsed, true}
+	return PingResult{resp.StatusCode, elapsed}
 }

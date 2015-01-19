@@ -25,6 +25,8 @@ func (s *Service) Start() {
 	fmt.Println("Starting service: " + s.Name + "...")
 	s.enabled = true
 
+	fmt.Printf("%+v\n", s)
+
 	for {
 
 		if s.enabled {
@@ -35,16 +37,11 @@ func (s *Service) Start() {
 
 			s.totalcounter++
 
-			if result.Success {
+			if result.StatusCode == 200 { //TODO: we need to redefine "Success". This will depend on some specific service rules (contains, statuscode, etc)
 				s.successcounter++
 			} else {
 				s.errorcounter++
 			}
-
-			// logging
-			s.Log()
-			result.Log()
-			fmt.Printf("avgLatency: %v\n", s.avgLatency)
 
 			time.Sleep(s.Interval * time.Millisecond)
 		}

@@ -1,7 +1,7 @@
 package core
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 	"vigilante/pingservices"
@@ -9,54 +9,36 @@ import (
 
 type MockPingService struct{}
 
-func (m *MockPingService) Ping(url string) pingservices.PingResult {
-	return pingservices.PingResult{200, 100, true}
+func (m *MockPingService) Ping(url string, timeout time.Duration) pingservices.PingResult {
+	return pingservices.PingResult{200, 100}
 }
 
-//TODO: investigate how to write shorter assertions
-//TODO: write more unit (less general) tests
 func TestService(t *testing.T) {
+
+	assert := assert.New(t)
+
 	service := Service{
-		"service 1",
-		"http://google.com",
-		100,
-		new(MockPingService),
-	}
+		Name:        "service google",
+		Url:         "http://google.com",
+		Interval:    100,
+		Timeout:     10000,
+		PingService: new(MockPingService)}
 
-	if service.Url != "http://google.com" {
-		t.Error("Invalid url")
-	}
+	assert.Equal(service.Url, "http://google.com", "valid url")
 
-	go func(service Service) {
-		fmt.Printf(service.Name)
+	go func(service *Service) {
 		service.Start()
-	}(service)
+	}(&service)
 
 	time.Sleep(time.Second * 1) // we need to somehow fake time
 
-	if service.IsEnabled() != true {
-		t.Error("It should be enabled")
-	}
+	assert.Equal(service.IsEnabled(), true, "service is enable")
 
 	service.Stop()
 
-	if service.IsEnabled() != false {
-		t.Error("It should be disabled")
-	}
-
-	if service.GetTotalCount() != 10 {
-		t.Error("Incorrect total count")
-	}
-
-	if service.GetSuccessCount() != 10 {
-		t.Error("Incorrect success count")
-	}
-
-	if service.GetErrorCount() != 0 {
-		t.Error("Incorrect error count")
-	}
-
-	if service.GetAVGLatency() != 100 {
-		t.Error("Incorrect latency")
-	}
+	assert.Equal(service.IsEnabled(), false, "service is disable")
+	assert.Equal(service.GetTotalCount(), 10, "total count")
+	assert.Equal(service.GetSuccessCount(), 10, "success count")
+	assert.Equal(service.GetErrorCount(), 0, "error count")
+	assert.Equal(service.GetAVGLatency(), 100, "avg latency")
 }

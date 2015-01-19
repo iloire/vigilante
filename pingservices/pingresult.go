@@ -6,12 +6,11 @@ import (
 )
 
 type PingResult struct {
-	Status  int
-	Elapsed time.Duration
-	Success bool
+	StatusCode int
+	Elapsed    time.Duration
 }
 
 func (p *PingResult) Log() {
-	fmt.Printf("status: %d\n", p.Status)
+	fmt.Printf("status: %d\n", p.StatusCode)
 	fmt.Printf("elapsed: %v\n", p.Elapsed)
 }
