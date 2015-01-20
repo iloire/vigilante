@@ -7,9 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+	"vigilante/rules"
 )
 
-func TestSuccessfulPing(t *testing.T) {
+func TestHTTPPingSuccessfulPingNoRules(t *testing.T) {
 
 	assert := assert.New(t)
 
@@ -19,24 +20,24 @@ func TestSuccessfulPing(t *testing.T) {
 	defer ts.Close()
 
 	http := new(HTTP)
-	result := http.Ping(ts.URL, time.Second*10)
+	result := http.Ping(ts.URL, time.Second*10, []rules.Rule{})
 
-	assert.Equal(result.StatusCode, 200, "should return 200")
+	assert.True(result.Success, "should be successful")
 }
 
-func TestRedirectStatusCodePing(t *testing.T) {
+func TestHTTPPingStatusCodeRule(t *testing.T) {
 
 	assert := assert.New(t)
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/someotherurl", http.StatusFound)
+		http.Redirect(w, r, "/someotherurl", http.StatusNotFound)
 	}))
 	defer ts.Close()
 
 	http := new(HTTP)
-	result := http.Ping(ts.URL, time.Second*10)
+	result := http.Ping(ts.URL, time.Second*10, []rules.Rule{rules.StatusCode{StatusCode: 200}})
 
-	assert.Equal(result.StatusCode, 302, "should return 302")
+	assert.False(result.Success, "should error")
 }
 
 // TODO: a test for timeout

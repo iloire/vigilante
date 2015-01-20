@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"vigilante/rules"
 )
 
 func TestVigilanteAddService(t *testing.T) {
@@ -16,16 +17,19 @@ func TestVigilanteAddService(t *testing.T) {
 		Url:         "http://google.com",
 		Interval:    5000,
 		Timeout:     10000,
-		PingService: new(MockPingService)})
+		PingService: new(MockPingService),
+		Rules:       []rules.Rule{&rules.Contains{Content: "google"}}})
 
 	v.AddService(Service{
 		Name:        "service yahoo",
 		Url:         "http://yahoo.com",
 		Interval:    5000,
 		Timeout:     10000,
-		PingService: new(MockPingService)})
+		PingService: new(MockPingService),
+		Rules:       []rules.Rule{&rules.Contains{Content: "yahoo"}}})
 
 	assert.Equal(len(v.GetServices()), 2, "number of services added is correct")
 	assert.Equal(v.GetServices()[0].Name, "service google", "correct service name")
 	assert.Equal(v.GetServices()[1].Name, "service yahoo", "correct service name")
+
 }

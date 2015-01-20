@@ -1,0 +1,1 @@
+go test vigilante/pingservices vigilante/core vigilante/rules

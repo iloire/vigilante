@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 	"vigilante/pingservices"
+	"vigilante/rules"
 )
 
 type Service struct {
@@ -12,6 +13,7 @@ type Service struct {
 	Interval    time.Duration
 	PingService pingservices.PingService
 	Timeout     time.Duration
+	Rules       []rules.Rule
 
 	enabled                      bool
 	totalcounter                 int
@@ -31,13 +33,13 @@ func (s *Service) Start() {
 
 		if s.enabled {
 
-			result := s.PingService.Ping(s.Url, s.Timeout)
+			result := s.PingService.Ping(s.Url, s.Timeout, s.Rules)
 
 			s.avgLatency = time.Duration((int(s.avgLatency)*s.totalcounter + int(result.Elapsed)) / (s.totalcounter + 1))
 
 			s.totalcounter++
 
-			if result.StatusCode == 200 { //TODO: we need to redefine "Success". This will depend on some specific service rules (contains, statuscode, etc)
+			if result.Success {
 				s.successcounter++
 			} else {
 				s.errorcounter++

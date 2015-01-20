@@ -5,12 +5,13 @@ import (
 	"testing"
 	"time"
 	"vigilante/pingservices"
+	"vigilante/rules"
 )
 
 type MockPingService struct{}
 
-func (m *MockPingService) Ping(url string, timeout time.Duration) pingservices.PingResult {
-	return pingservices.PingResult{200, 100}
+func (m *MockPingService) Ping(url string, timeout time.Duration, rules []rules.Rule) pingservices.PingResult {
+	return pingservices.PingResult{true, 100, nil}
 }
 
 func TestService(t *testing.T) {
