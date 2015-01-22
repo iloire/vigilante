@@ -1,9 +1,9 @@
 package core
 
 import (
+	"github.com/iloire/vigilante/rules"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"vigilante/rules"
 )
 
 func TestVigilanteAddService(t *testing.T) {

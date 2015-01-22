@@ -2,10 +2,10 @@ package pingservices
 
 import (
 	"fmt"
+	"github.com/iloire/vigilante/rules"
 	"io/ioutil"
 	"net/http"
 	"time"
-	"vigilante/rules"
 )
 
 type HTTP struct{}

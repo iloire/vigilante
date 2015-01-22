@@ -2,9 +2,9 @@ package core
 
 import (
 	"fmt"
+	"github.com/iloire/vigilante/pingservices"
+	"github.com/iloire/vigilante/rules"
 	"time"
-	"vigilante/pingservices"
-	"vigilante/rules"
 )
 
 type Service struct {

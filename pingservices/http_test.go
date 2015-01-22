@@ -2,12 +2,12 @@ package pingservices
 
 import (
 	"fmt"
+	"github.com/iloire/vigilante/rules"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
-	"vigilante/rules"
 )
 
 func TestHTTPPingSuccessfulPingNoRules(t *testing.T) {

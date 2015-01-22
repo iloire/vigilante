@@ -1,8 +1,8 @@
 package pingservices
 
 import (
+	"github.com/iloire/vigilante/rules"
 	"time"
-	"vigilante/rules"
 )
 
 type PingService interface {

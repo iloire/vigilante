@@ -1,11 +1,11 @@
 package core
 
 import (
+	"github.com/iloire/vigilante/pingservices"
+	"github.com/iloire/vigilante/rules"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-	"vigilante/pingservices"
-	"vigilante/rules"
 )
 
 type MockPingService struct{}

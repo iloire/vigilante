@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/iloire/vigilante/core"
+	"github.com/iloire/vigilante/pingservices"
 	"sync"
-	"vigilante/core"
-	"vigilante/pingservices"
 )
 
 var wg sync.WaitGroup
