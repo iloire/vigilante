@@ -8,12 +8,13 @@ import (
 )
 
 type Service struct {
-	Name        string
-	Url         string
-	Interval    time.Duration
-	PingService pingservices.PingService
-	Timeout     time.Duration
-	Rules       []rules.Rule
+	Name             string
+	Url              string
+	Interval         time.Duration
+	RecoveryInterval time.Duration
+	PingService      pingservices.PingService
+	Timeout          time.Duration
+	Rules            []rules.Rule
 
 	enabled                      bool
 	totalcounter                 int
@@ -27,25 +28,24 @@ func (s *Service) Start() {
 	fmt.Println("Starting service: " + s.Name + "...")
 	s.enabled = true
 
-	for {
+	for s.enabled {
+		result := s.PingService.Ping(s.Url, s.Timeout, s.Rules)
 
-		if s.enabled {
+		s.avgLatency = time.Duration((int(s.avgLatency)*s.totalcounter + int(result.Elapsed)) / (s.totalcounter + 1))
 
-			result := s.PingService.Ping(s.Url, s.Timeout, s.Rules)
+		s.totalcounter++
 
-			s.avgLatency = time.Duration((int(s.avgLatency)*s.totalcounter + int(result.Elapsed)) / (s.totalcounter + 1))
+		var nextInterval = s.Interval * time.Millisecond
 
-			s.totalcounter++
-
-			if result.Success {
-				s.successcounter++
-			} else {
-				s.errorcounter++
+		if result.Success {
+			s.successcounter++
+		} else {
+			s.errorcounter++
+			if s.RecoveryInterval != 0 {
+				nextInterval = s.RecoveryInterval * time.Millisecond
 			}
-
-			time.Sleep(s.Interval * time.Millisecond)
 		}
-
+		time.Sleep(nextInterval)
 	}
 }
 
