@@ -8,28 +8,31 @@ import (
 	"time"
 )
 
-type MockPingService struct{}
-
-func (m *MockPingService) Ping(url string, timeout time.Duration, rules []rules.Rule) pingservices.PingResult {
-	return pingservices.PingResult{true, 100, nil}
+type MockPingService struct {
+	nextPingResult pingservices.PingResult
 }
 
-type MockFailingPingService struct{}
+func (m *MockPingService) Ping(url string, timeout time.Duration, rules []rules.Rule) pingservices.PingResult {
+	return m.nextPingResult
+}
 
-func (m *MockFailingPingService) Ping(url string, timeout time.Duration, rules []rules.Rule) pingservices.PingResult {
-	return pingservices.PingResult{false, 200, []string{"Error"}}
+func (m *MockPingService) SetNextResult(result pingservices.PingResult) {
+	m.nextPingResult = result
 }
 
 func TestServiceIsEnabled(t *testing.T) {
 
 	assert := assert.New(t)
 
+	mockPingService := new(MockPingService)
+	mockPingService.SetNextResult(pingservices.PingResult{true, 100, nil})
+
 	service := Service{
 		Name:        "service google",
 		Url:         "http://google.com",
 		Interval:    10,
 		Timeout:     10000,
-		PingService: new(MockPingService)}
+		PingService: mockPingService}
 
 	go func(service *Service) {
 		service.Start()
@@ -46,12 +49,15 @@ func TestServiceInterval(t *testing.T) {
 
 	assert := assert.New(t)
 
+	mockPingService := new(MockPingService)
+	mockPingService.SetNextResult(pingservices.PingResult{true, 100, nil})
+
 	service := Service{
 		Name:        "service google",
 		Url:         "http://google.com",
 		Interval:    10,
 		Timeout:     10000,
-		PingService: new(MockPingService)}
+		PingService: mockPingService}
 
 	go func(service *Service) {
 		service.Start()
@@ -71,13 +77,16 @@ func TestServiceRecoveryInterval(t *testing.T) {
 
 	assert := assert.New(t)
 
+	mockPingService := new(MockPingService)
+	mockPingService.SetNextResult(pingservices.PingResult{false, 200, []string{"Error"}})
+
 	service := Service{
 		Name:             "service google",
 		Url:              "http://google.com",
 		Interval:         10,
 		RecoveryInterval: 5,
 		Timeout:          10000,
-		PingService:      new(MockFailingPingService)}
+		PingService:      mockPingService}
 
 	go func(service *Service) {
 		service.Start()
@@ -96,12 +105,15 @@ func TestServiceRecoveryIntervalDefaultsToInterval(t *testing.T) {
 
 	assert := assert.New(t)
 
+	mockPingService := new(MockPingService)
+	mockPingService.SetNextResult(pingservices.PingResult{false, 200, []string{"Error"}})
+
 	service := Service{
 		Name:        "service google",
 		Url:         "http://google.com",
 		Interval:    10,
 		Timeout:     10000,
-		PingService: new(MockFailingPingService)}
+		PingService: mockPingService}
 
 	go func(service *Service) {
 		service.Start()
