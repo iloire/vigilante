@@ -1,9 +1,5 @@
 package core
 
-import (
-	"fmt"
-)
-
 type Vigilante struct{}
 
 var services []Service
@@ -19,7 +15,6 @@ func (v *Vigilante) GetServices() []Service {
 func (v *Vigilante) Start() {
 	for _, service := range services {
 		go func(service Service) {
-			fmt.Printf(service.Name)
 			service.Start()
 		}(service)
 	}

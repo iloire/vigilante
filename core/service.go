@@ -27,8 +27,6 @@ func (s *Service) Start() {
 	fmt.Println("Starting service: " + s.Name + "...")
 	s.enabled = true
 
-	fmt.Printf("%+v\n", s)
-
 	for {
 
 		if s.enabled {
