@@ -35,6 +35,8 @@ func TestServiceIsEnabled(t *testing.T) {
 		service.Start()
 	}(&service)
 
+	time.Sleep(time.Millisecond * 1) // TODO: find a better way
+
 	assert.Equal(service.IsEnabled(), true, "service is enable")
 	service.Stop()
 	assert.Equal(service.IsEnabled(), false, "service is disable")
