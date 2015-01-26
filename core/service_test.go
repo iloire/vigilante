@@ -30,16 +30,16 @@ func TestServiceIsEnabled(t *testing.T) {
 	service := Service{
 		Name:        "service google",
 		Url:         "http://google.com",
-		Interval:    10,
+		Interval:    1,
 		Timeout:     10000,
 		PingService: mockPingService}
 
+	c := make(chan pingservices.PingResult)
 	go func(service *Service) {
-		service.Start()
+		service.Start(c)
 	}(&service)
 
-	time.Sleep(time.Millisecond * 1) // TODO: find a better way
-
+	<-c
 	assert.Equal(service.IsEnabled(), true, "service is enable")
 	service.Stop()
 	assert.Equal(service.IsEnabled(), false, "service is disable")
@@ -55,15 +55,17 @@ func TestServiceInterval(t *testing.T) {
 	service := Service{
 		Name:        "service google",
 		Url:         "http://google.com",
-		Interval:    10,
+		Interval:    1,
 		Timeout:     10000,
 		PingService: mockPingService}
 
+	c := make(chan pingservices.PingResult)
 	go func(service *Service) {
-		service.Start()
+		service.Start(c)
 	}(&service)
 
-	time.Sleep(time.Millisecond * 20) // we need to somehow fake time
+	<-c
+	<-c
 
 	service.Stop()
 
@@ -89,7 +91,7 @@ func TestServiceRecoveryInterval(t *testing.T) {
 		PingService:      mockPingService}
 
 	go func(service *Service) {
-		service.Start()
+		service.Start(nil)
 	}(&service)
 
 	time.Sleep(time.Millisecond * 20) // we need to somehow fake time
@@ -116,7 +118,7 @@ func TestServiceRecoveryIntervalDefaultsToInterval(t *testing.T) {
 		PingService: mockPingService}
 
 	go func(service *Service) {
-		service.Start()
+		service.Start(nil)
 	}(&service)
 
 	time.Sleep(time.Millisecond * 20) // we need to somehow fake time

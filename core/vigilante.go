@@ -15,7 +15,7 @@ func (v *Vigilante) GetServices() []Service {
 func (v *Vigilante) Start() {
 	for _, service := range services {
 		go func(service Service) {
-			service.Start()
+			service.Start(nil)
 		}(service)
 	}
 }

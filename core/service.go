@@ -24,7 +24,7 @@ type Service struct {
 
 // Starts the service.
 // It will be executing the "PingService" every "Interval" until it gets stopped.
-func (s *Service) Start() {
+func (s *Service) Start(c chan pingservices.PingResult) {
 	fmt.Println("Starting service: " + s.Name + "...")
 	s.enabled = true
 
@@ -44,6 +44,9 @@ func (s *Service) Start() {
 			if s.RecoveryInterval != 0 {
 				nextInterval = s.RecoveryInterval * time.Millisecond
 			}
+		}
+		if c != nil {
+			c <- result
 		}
 		time.Sleep(nextInterval)
 	}
