@@ -15,27 +15,44 @@ type Service struct {
 	PingService      pingservices.PingService
 	Timeout          time.Duration
 	Rules            []rules.Rule
+	Clock            Clock
 
+	runningTotal                 time.Duration
+	errorTotal                   time.Duration
+	lastResult                   *LastResult
 	enabled                      bool
 	totalcounter                 int
 	successcounter, errorcounter int
 	avgLatency                   time.Duration
 }
 
+type LastResult struct {
+	TimeStamp  time.Time
+	PingResult pingservices.PingResult
+}
+
 // Starts the service.
 // It will be executing the "PingService" every "Interval" until it gets stopped.
 func (s *Service) Start(c chan pingservices.PingResult) {
+
 	fmt.Println("Starting service: " + s.Name + "...")
+
 	s.enabled = true
 
 	for s.enabled {
 		result := s.PingService.Ping(s.Url, s.Timeout, s.Rules)
-
 		s.avgLatency = time.Duration((int(s.avgLatency)*s.totalcounter + int(result.Elapsed)) / (s.totalcounter + 1))
 
 		s.totalcounter++
 
 		var nextInterval = s.Interval * time.Millisecond
+
+		if s.lastResult != nil {
+			s.runningTotal += s.Clock.Since(s.lastResult.TimeStamp)
+			if !s.lastResult.PingResult.Success {
+				s.errorTotal += s.Clock.Since(s.lastResult.TimeStamp)
+			}
+		}
 
 		if result.Success {
 			s.successcounter++
@@ -45,9 +62,13 @@ func (s *Service) Start(c chan pingservices.PingResult) {
 				nextInterval = s.RecoveryInterval * time.Millisecond
 			}
 		}
+
+		s.lastResult = &LastResult{s.Clock.Now(), result}
+
 		if c != nil {
 			c <- result
 		}
+
 		time.Sleep(nextInterval)
 	}
 }
@@ -60,6 +81,25 @@ func (s *Service) Stop() {
 
 func (s *Service) Log() {
 	fmt.Printf("--\nPing from %s: success: %d, error: %d\n", s.Name, s.successcounter, s.errorcounter)
+}
+
+func (s *Service) GetLastResult() *LastResult {
+	return s.lastResult
+}
+
+func (s *Service) GetUpTime() int {
+	if s.runningTotal == 0 {
+		return 0
+	}
+	return (int)((s.runningTotal*time.Nanosecond - s.errorTotal*time.Nanosecond) * 100 / s.runningTotal * time.Nanosecond)
+}
+
+func (s *Service) GetRunningTotal() time.Duration {
+	return s.runningTotal
+}
+
+func (s *Service) GetErrorTotal() time.Duration {
+	return s.errorTotal
 }
 
 // Number of ping executions
