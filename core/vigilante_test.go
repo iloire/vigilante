@@ -28,8 +28,8 @@ func TestVigilanteAddService(t *testing.T) {
 		PingService: new(MockPingService),
 		Rules:       []rules.Rule{&rules.Contains{Content: "yahoo"}}})
 
-	assert.Equal(len(v.GetServices()), 2, "number of services added is correct")
-	assert.Equal(v.GetServices()[0].Name, "service google", "correct service name")
-	assert.Equal(v.GetServices()[1].Name, "service yahoo", "correct service name")
+	assert.Equal(2, len(v.GetServices()), "number of services added is correct")
+	assert.Equal("service google", v.GetServices()[0].Name, "correct service name")
+	assert.Equal("service yahoo", v.GetServices()[1].Name, "correct service name")
 
 }

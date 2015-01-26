@@ -40,9 +40,9 @@ func TestServiceIsEnabled(t *testing.T) {
 	}(&service)
 
 	<-c
-	assert.Equal(service.IsEnabled(), true, "service is enable")
+	assert.True(service.IsEnabled(), "service is enable")
 	service.Stop()
-	assert.Equal(service.IsEnabled(), false, "service is disable")
+	assert.False(service.IsEnabled(), "service is disable")
 }
 
 func TestServiceInterval(t *testing.T) {
@@ -69,10 +69,10 @@ func TestServiceInterval(t *testing.T) {
 
 	service.Stop()
 
-	assert.Equal(service.GetTotalCount(), 2, "total count")
-	assert.Equal(service.GetSuccessCount(), 2, "success count")
-	assert.Equal(service.GetErrorCount(), 0, "error count")
-	assert.Equal(service.GetAVGLatency(), 100, "avg latency")
+	assert.Equal(2, service.GetTotalCount(), "total count")
+	assert.Equal(2, service.GetSuccessCount(), "success count")
+	assert.Equal(0, service.GetErrorCount(), "error count")
+	assert.Equal(100, service.GetAVGLatency(), "avg latency")
 }
 
 func TestServiceRecoveryInterval(t *testing.T) {
@@ -98,9 +98,9 @@ func TestServiceRecoveryInterval(t *testing.T) {
 
 	service.Stop()
 
-	assert.Equal(service.GetTotalCount(), 4, "total count")
-	assert.Equal(service.GetSuccessCount(), 0, "success count")
-	assert.Equal(service.GetErrorCount(), 4, "error count")
+	assert.Equal(4, service.GetTotalCount(), "total count")
+	assert.Equal(0, service.GetSuccessCount(), "success count")
+	assert.Equal(4, service.GetErrorCount(), "error count")
 }
 
 func TestServiceRecoveryIntervalDefaultsToInterval(t *testing.T) {
@@ -125,7 +125,7 @@ func TestServiceRecoveryIntervalDefaultsToInterval(t *testing.T) {
 
 	service.Stop()
 
-	assert.Equal(service.GetTotalCount(), 2, "total count")
-	assert.Equal(service.GetSuccessCount(), 0, "success count")
-	assert.Equal(service.GetErrorCount(), 2, "error count")
+	assert.Equal(2, service.GetTotalCount(), "total count")
+	assert.Equal(0, service.GetSuccessCount(), "success count")
+	assert.Equal(2, service.GetErrorCount(), "error count")
 }
