@@ -1,7 +1,6 @@
 package pingservices
 
 import (
-	"fmt"
 	"github.com/iloire/vigilante/rules"
 	"io/ioutil"
 	"net/http"
@@ -19,7 +18,6 @@ func (h *HTTP) Ping(url string, timeout time.Duration, rules []rules.Rule) PingR
 	elapsed := time.Since(start)
 
 	if err != nil {
-		fmt.Println(err)
 		return PingResult{true, elapsed, []string{err.Error()}}
 	}
 
@@ -30,7 +28,6 @@ func (h *HTTP) Ping(url string, timeout time.Duration, rules []rules.Rule) PingR
 
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
 		return PingResult{false, elapsed, []string{err.Error()}}
 	}
 

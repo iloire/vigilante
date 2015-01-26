@@ -48,6 +48,7 @@ func (s *Service) Start(c chan pingservices.PingResult) {
 
 	for s.enabled {
 		result := s.PingService.Ping(s.Url, s.Timeout, s.Rules)
+		fmt.Printf("\n\n%s: %v", s.Url, result)
 		s.avgLatency = time.Duration((int(s.avgLatency)*s.totalcounter + int(result.Elapsed)) / (s.totalcounter + 1))
 
 		s.totalcounter++
