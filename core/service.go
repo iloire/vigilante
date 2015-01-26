@@ -26,6 +26,11 @@ type Service struct {
 	avgLatency                   time.Duration
 }
 
+type RealClock struct{}
+
+func (m RealClock) Now() time.Time                  { return time.Now() }
+func (m RealClock) Since(t time.Time) time.Duration { return time.Since(t) }
+
 type LastResult struct {
 	TimeStamp  time.Time
 	PingResult pingservices.PingResult
@@ -35,7 +40,9 @@ type LastResult struct {
 // It will be executing the "PingService" every "Interval" until it gets stopped.
 func (s *Service) Start(c chan pingservices.PingResult) {
 
-	fmt.Println("Starting service: " + s.Name + "...")
+	if s.Clock == nil {
+		s.Clock = new(RealClock)
+	}
 
 	s.enabled = true
 
@@ -45,7 +52,7 @@ func (s *Service) Start(c chan pingservices.PingResult) {
 
 		s.totalcounter++
 
-		var nextInterval = s.Interval * time.Millisecond
+		var nextInterval = s.Interval
 
 		if s.lastResult != nil {
 			s.runningTotal += s.Clock.Since(s.lastResult.TimeStamp)
@@ -59,7 +66,7 @@ func (s *Service) Start(c chan pingservices.PingResult) {
 		} else {
 			s.errorcounter++
 			if s.RecoveryInterval != 0 {
-				nextInterval = s.RecoveryInterval * time.Millisecond
+				nextInterval = s.RecoveryInterval
 			}
 		}
 
@@ -76,7 +83,6 @@ func (s *Service) Start(c chan pingservices.PingResult) {
 // Stops the service
 func (s *Service) Stop() {
 	s.enabled = false
-	fmt.Println("Stopping service: " + s.Name + "...")
 }
 
 func (s *Service) Log() {
