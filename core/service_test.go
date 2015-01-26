@@ -180,7 +180,7 @@ func getServiceForTesting(interval time.Duration) (*Service, *MockClock, *MockPi
 		Name:        "service google",
 		Url:         "http://google.com",
 		Interval:    interval,
-		Timeout:     10000,
+		Timeout:     10 * time.Second,
 		PingService: mockedPingService,
 		Clock:       mockedClock}
 

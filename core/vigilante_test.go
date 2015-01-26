@@ -4,6 +4,7 @@ import (
 	"github.com/iloire/vigilante/rules"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestVigilanteAddService(t *testing.T) {
@@ -15,16 +16,16 @@ func TestVigilanteAddService(t *testing.T) {
 	v.AddService(Service{
 		Name:        "service google",
 		Url:         "http://google.com",
-		Interval:    5000,
-		Timeout:     10000,
+		Interval:    5 * time.Second,
+		Timeout:     10 * time.Second,
 		PingService: new(MockPingService),
 		Rules:       []rules.Rule{&rules.Contains{Content: "google"}}})
 
 	v.AddService(Service{
 		Name:        "service yahoo",
 		Url:         "http://yahoo.com",
-		Interval:    5000,
-		Timeout:     10000,
+		Interval:    5 * time.Second,
+		Timeout:     10 * time.Second,
 		PingService: new(MockPingService),
 		Rules:       []rules.Rule{&rules.Contains{Content: "yahoo"}}})
 

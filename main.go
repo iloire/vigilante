@@ -4,6 +4,7 @@ import (
 	"github.com/iloire/vigilante/core"
 	"github.com/iloire/vigilante/pingservices"
 	"sync"
+	"time"
 )
 
 var wg sync.WaitGroup
@@ -17,29 +18,29 @@ func main() {
 	v.AddService(core.Service{
 		Name:        "service google",
 		Url:         "http://google.com",
-		Interval:    5000,
-		Timeout:     10000,
+		Interval:    5 * time.Second,
+		Timeout:     10 * time.Second,
 		PingService: new(pingservices.HTTP)})
 
 	v.AddService(core.Service{
 		Name:        "service yahoo",
 		Url:         "http://yahoo.com",
-		Interval:    5000,
-		Timeout:     10000,
+		Interval:    5 * time.Second,
+		Timeout:     10 * time.Second,
 		PingService: new(pingservices.HTTP)})
 
 	v.AddService(core.Service{
 		Name:        "service localhost",
 		Url:         "http://iloire.dyn.syd.atlassian.com:8080/confluence",
-		Interval:    5000,
-		Timeout:     5000,
+		Interval:    5 * time.Second,
+		Timeout:     10 * time.Second,
 		PingService: new(pingservices.HTTP)})
 
 	v.AddService(core.Service{
 		Name:        "service INVALID",
 		Url:         "http://invalid",
-		Interval:    5000,
-		Timeout:     1000,
+		Interval:    5 * time.Second,
+		Timeout:     10 * time.Second,
 		PingService: new(pingservices.HTTP)})
 
 	v.Start()
